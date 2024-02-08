@@ -1,56 +1,42 @@
-# This is a dummay code for now
-
 import os
 import shutil
 import tarfile
 import zipfile
+from datetime import datetime
 
 def compress_folder(folder_path, compress_type):
-    folder_name = os.path.basename(folder_path)
-    output_filename = f"{folder_name}_{date_today()}.{compress_type}"
     try:
-        if compress_type == 'zip':
-            with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for root, dirs, files in os.walk(folder_path):
-                    for file in files:
-                        zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), folder_path))
-            print(f"Folder '{folder_name}' compressed successfully as '{output_filename}'.")
-        elif compress_type == 'tar':
-            with tarfile.open(output_filename, 'w') as tarf:
-                tarf.add(folder_path, arcname=os.path.basename(folder_path))
-            print(f"Folder '{folder_name}' compressed successfully as '{output_filename}'.")
-        elif compress_type == 'tgz':
-            with tarfile.open(output_filename, 'w:gz') as tarf:
-                tarf.add(folder_path, arcname=os.path.basename(folder_path))
-            print(f"Folder '{folder_name}' compressed successfully as '{output_filename}'.")
-        else:
-            print("Unsupported compression type.")
-    except Exception as e:
-        print(f"Compression failed: {e}")
+        folder_name = os.path.basename(folder_path)
+        current_date = datetime.now().strftime("%Y_%m_%d")
+        compressed_file_name = f"{folder_name}_{current_date}.{compress_type}"
 
-def date_today():
-    import datetime
-    today = datetime.date.today()
-    return today.strftime("%Y_%m_%d")
+        if compress_type == 'zip':
+            with zipfile.ZipFile(compressed_file_name, 'w') as zip_file:
+                [zip_file.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), folder_path))
+                 for root, _, files in os.walk(folder_path) for file in files]
+        elif compress_type in ['tar', 'tgz']:
+            with tarfile.open(compressed_file_name, f'w:{"gz" if compress_type == "tgz" else ""}') as tar_file:
+                tar_file.add(folder_path, arcname=os.path.basename(folder_path))
+        else:
+            raise ValueError("Invalid compression type. Supported types: zip, tar, tgz")
+
+        print(f"Compression successful. Compressed file saved as: {compressed_file_name}")
+        return True
+
+    except Exception as e:
+        print(f"Compression failed. Error: {str(e)}")
+        return False
 
 def main():
-    folder_path = input("Enter the path of the folder to compress: ").strip()
-    if not os.path.exists(folder_path):
-        print("Folder does not exist.")
-        return
+    folder_path = input("Enter the path of the folder to compress: ")
 
-    print("Available compressed file types:")
-    print("1. zip")
-    print("2. tar")
-    print("3. tgz")
+    print("Available compressed file types: zip, tar, tgz")
+    compress_type = input("Enter the desired compression type: ")
 
-    compress_type = input("Select the desired compressed file type: ").strip().lower()
-
-    if compress_type not in ['zip', 'tar', 'tgz']:
-        print("Invalid compression type.")
-        return
-
-    compress_folder(folder_path, compress_type)
+    if compress_type.lower() in {'zip', 'tar', 'tgz'}:
+        compress_folder(folder_path, compress_type.lower())
+    else:
+        print("Invalid compression type. Please choose a valid option.")
 
 if __name__ == "__main__":
     main()

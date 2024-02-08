@@ -43,3 +43,4 @@ Suppose you have a folder named `MyFolder` located at `C:\Users\Username\Documen
 - Ola-Adisa Shobi <s.olaadisa@alustudent.com>
 - Purity Kihiu <p.kihiu@alustudent.com>
 - Pascal Mugisha <p.mugisha@alustudent.com>
+- Denys NTWARITAGANZWA <d.ntwaritag@alustudent.com>
